@@ -44,7 +44,7 @@ This project is a Python-based phishing email detection system. It analyzes emai
 
 You can install the required packages using the following command:
 
-```bash
+bash
 pip install pyyaml python-dotenv
 Setup
 Clone the Repository:
@@ -94,7 +94,8 @@ Example:
 bash
 Copy code
 python email_scan.py emails.json report.txt recipient@example.com
-Running the Phishing Detection Tool with Docker
+
+## Running the Phishing Detection Tool with Docker
 This project is packaged as a Docker container to make it easy to execute on any machine with Docker installed. Follow the steps below to pull the Docker image from Docker Hub and execute the tool.
 
 Prerequisites
