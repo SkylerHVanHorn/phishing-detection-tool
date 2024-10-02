@@ -5,21 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="88fda88c-424e-452b-bf0f-dc2495062589" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/Pfizer_Email_Assesment.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/config/Indicators.yaml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/email_processor/PhishingEmail.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/email_processor/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/email_processor/email_processor.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/email_processor/utils.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/email_scan.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/sample_emails_v2.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/tests/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/tests/test_email_processor.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/send_email_credentials.env" beforeDir="false" afterPath="$PROJECT_DIR$/config/send_email_credentials.env" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/email_processor/email_processor.py" beforeDir="false" afterPath="$PROJECT_DIR$/email_processor/email_processor.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/report.txt" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -48,14 +38,14 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Python.main.executor": "Run",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "master",
-    "last_opened_file_path": "C:/Users/skyhv/PycharmProjects/Pfizer_Email_Assesment/tests"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Python.main.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/skyhv/PycharmProjects/Pfizer_Email_Assesment/tests&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\skyhv\PycharmProjects\Pfizer_Email_Assesment\tests" />

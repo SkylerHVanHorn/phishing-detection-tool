@@ -20,7 +20,8 @@ suspicious_activity_mapping = {
 }
 
 # Load environment variables from the .env file
-load_dotenv('../config/send_email_credentials.env')
+#load_dotenv('../config/send_email_credentials.env') Only works when running the code locally and not in docker container
+load_dotenv('/app/.env') #need to reference docker container file
 
 class EmailProcessor:
     """

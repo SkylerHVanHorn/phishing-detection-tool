@@ -30,6 +30,8 @@ This project is a Python-based phishing email detection system. It analyzes emai
 
 **test_email_processor.py** # Unit tests for the program
 
+
+## Running Phishing Detection Tool Locally after pulling from GitHub
 ## Requirements
 
 - Python 3.10+
@@ -92,6 +94,54 @@ Example:
 bash
 Copy code
 python email_scan.py emails.json report.txt recipient@example.com
+Running the Phishing Detection Tool with Docker
+This project is packaged as a Docker container to make it easy to execute on any machine with Docker installed. Follow the steps below to pull the Docker image from Docker Hub and execute the tool.
+
+Prerequisites
+Docker: Ensure Docker is installed and running on your system. You can install Docker following the instructions from the official Docker documentation.
+Docker Hub Account: If you're using a private Docker Hub repository, ensure that you have access to the repository and are logged in.
+Docker Image
+This project has been pushed to Docker Hub under the repository: skyhvh/phishing-detection-tool.
+
+Steps to Run
+Pull the Docker Image
+
+First, pull the Docker image from Docker Hub:
+
+bash
+Copy code
+docker pull skyhvh/phishing-detection-tool:latest
+Prepare the Input Files
+
+Ensure you have your sample_emails.json file or a similarly structured JSON file that contains the email data. This file should be available on your local machine.
+
+Run the Docker Container
+
+You can run the container with the following command:
+
+bash
+Copy code
+docker run -it \
+  -v /path/to/your/sample_emails.json:/app/sample_emails.json \
+  -v /path/to/your/output_directory:/app/reports \
+  skyhvh/phishing-detection-tool:latest python email_scan.py /app/sample_emails.json /app/reports/output_report.txt
+Replace /path/to/your/sample_emails.json with the absolute path to your sample_emails.json file.
+Replace /path/to/your/output_directory with the absolute path to the directory where you want the report to be saved.
+The program will generate output_report.txt in the specified output directory.
+Access the Report
+
+Once the Docker container finishes running, the report will be available in your specified output directory on your local machine. You can open and review the report, which will contain details about any phishing or suspicious emails found.
+
+Example
+If you have your sample_emails.json file located at /home/user/sample_emails.json and you want to save the report in /home/user/reports, you would run:
+
+bash
+Copy code
+docker run -it \
+  -v /home/user/sample_emails.json:/app/sample_emails.json \
+  -v /home/user/reports:/app/reports \
+  skyhvh/phishing-detection-tool:latest python email_scan.py /app/sample_emails.json /app/reports/output_report.txt
+
 Sample Input JSON Structure
 Here's an example of what the input JSON file should look like:
 
