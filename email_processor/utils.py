@@ -22,5 +22,33 @@ def extract_urls(text):
     Returns:
         list: A list of extracted URLs.
     """
-    url_pattern = r'hxxp?://[^\s]+'
+    url_pattern = r'hxxps?://[^\s]+'
     return re.findall(url_pattern, text)  # Find all URLs in the text
+
+def extract_domain_from_received(received_header):
+    """
+    Extract the domain from the 'Received' header using regex.
+
+    Args:
+        received_header (str): The 'Received' header from an email.
+
+    Returns:
+        str: The extracted domain or an empty string if not found.
+    """
+    # Regex pattern to extract the domain from the Received header
+    match = re.search(r'from\s+([a-zA-Z0-9.-]+\.[a-zA-Z]{2,})', received_header)
+    if match:
+        return match.group(1)
+    return ''
+
+def extract_domain(sender):
+    """
+    Extract the domain from the sender's email address.
+
+    Args:
+        sender (str): The sender's email address.
+
+    Returns:
+        str: The extracted domain.
+    """
+    return sender.split('@')[-1] if '@' in sender else ''

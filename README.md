@@ -9,7 +9,7 @@ This project is a Python-based phishing email detection system. It analyzes emai
   - **Trusted**: Emails from trusted domains.
   - **Benign**: Emails not from trusted domains but no reason to suspect malicious activity (no embedded URLs or malicious keywords).
   - **Suspicious**: Emails from untrusted domains containing embedded URLs but no malicious keywords.
-  - **Malicious**: Emails containing malicious keywords from untrusted domains.
+  - **Malicious**: Emails containing malicious keywords from untrusted domains and/or evidence of typosquatting.
 - Generates a detailed report containing suspicious and malicious emails with reasoning.
 - Supports sending the report to a specified email address.
 - Can be extended and unit tested.
