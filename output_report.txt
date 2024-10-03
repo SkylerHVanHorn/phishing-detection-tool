@@ -12,62 +12,62 @@ This report provides an overview of malicious and suspicious emails.
 Summary of Findings:
 
 Suspicious Keywords Found:
-  - click here
-  - urgent
-  - verify your account
   - account locked
+  - click here
+  - verify your account
   - action required
+  - urgent
 
 Suspicious Activities Found:
-  - False Authority
   - False sense of Urgency
   - Embedded URL
+  - False Authority
+  - Pretexting
   - Untrusted sender
   - Intimidation
-  - Pretexting
 
 Malicious Emails Detected: 7
 Details of Malicious Emails:
 
 [2024-08-27T08:30:00Z] From: phisher@malicious.com (IP: 192.0.2.1) To: user@example.com Subject: Urgent: Verify your account
-  Suspicious Activity: False Authority, False sense of Urgency, Embedded URL, Untrusted sender, Pretexting
+  Suspicious Activity: False sense of Urgency, Embedded URL, False Authority, Pretexting, Untrusted sender
   Suspicious Keywords Found: click here, verify your account, urgent
   Embedded URLs:
     hxxp://malicious[.]com
 --------------------------------------------------
 [2024-08-27T11:00:00Z] From: support@bank.com (IP: 192.0.2.2) To: user@example.com Subject: Account Locked
-  Suspicious Activity: Embedded URL, Intimidation, Pretexting, Untrusted sender
-  Suspicious Keywords Found: click here, account locked
+  Suspicious Activity: Untrusted sender, Intimidation, Embedded URL, Pretexting
+  Suspicious Keywords Found: account locked, click here
   Embedded URLs:
     hxxp://bank[.]com/unlock
 --------------------------------------------------
 [2024-08-27T12:00:00Z] From: info@company.com (IP: 198.51.100.2) To: user@example.com Subject: Important: Action Required
-  Suspicious Activity: Embedded URL, False sense of Urgency, Untrusted sender
+  Suspicious Activity: Untrusted sender, False sense of Urgency, Embedded URL
   Suspicious Keywords Found: action required
   Embedded URLs:
     hxxp://company[.]com/action
 --------------------------------------------------
 [2024-08-27T14:00:00Z] From: alerts@security.com (IP: 192.0.2.3) To: user@example.com Subject: Security Alert
-  Suspicious Activity: Embedded URL, False Authority, Untrusted sender
+  Suspicious Activity: Untrusted sender, Embedded URL, False Authority
   Suspicious Keywords Found: verify your account
   Embedded URLs:
     hxxp://security[.]com/verify
 --------------------------------------------------
 [2024-08-27T16:00:00Z] From: admin@phish.com (IP: 203.0.113.3) To: user@example.com Subject: Verify Your Account
-  Suspicious Activity: Embedded URL, False Authority, Pretexting, Untrusted sender
+  Suspicious Activity: Untrusted sender, Embedded URL, False Authority, Pretexting
   Suspicious Keywords Found: click here, verify your account
   Embedded URLs:
     hxxp://phish[.]com/verify
 --------------------------------------------------
 [2024-08-27T19:00:00Z] From: alerts@malicious.com (IP: 203.0.113.4) To: user@example.com Subject: Security Alert
-  Suspicious Activity: Embedded URL, False Authority, Untrusted sender
+  Suspicious Activity: Untrusted sender, Embedded URL, False Authority
   Suspicious Keywords Found: verify your account
   Embedded URLs:
     hxxp://malicious[.]com/verify
 --------------------------------------------------
 [2024-08-27T22:00:00Z] From: support@bank.com (IP: 203.0.113.5) To: user@example.com Subject: Account Locked
-  Suspicious Activity: Embedded URL, Intimidation, Pretexting, Untrusted sender
-  Suspicious Keywords Found: click here, account locked
+  Suspicious Activity: Untrusted sender, Intimidation, Embedded URL, Pretexting
+  Suspicious Keywords Found: account locked, click here
   Embedded URLs:
     hxxp://bank[.]com/unlock
 --------------------------------------------------
@@ -76,13 +76,13 @@ Suspicious Emails Detected: 2
 Details of Suspicious Emails:
 
 [2024-08-27T10:00:00Z] From: admin@secure.com (IP: 203.0.113.1) To: user@example.com Subject: Security Alert: Update Required
-  Suspicious Activity: Embedded URL, Untrusted sender
+  Suspicious Activity: Untrusted sender, Embedded URL
   Suspicious Keywords Found: None
   Embedded URLs:
     hxxp://secure[.]com/update
 --------------------------------------------------
 [2024-08-27T21:00:00Z] From: admin@secure.com (IP: 198.51.100.5) To: user@example.com Subject: Security Update
-  Suspicious Activity: Embedded URL, Untrusted sender
+  Suspicious Activity: Untrusted sender, Embedded URL
   Suspicious Keywords Found: None
   Embedded URLs:
     hxxp://secure[.]com/update
@@ -92,16 +92,16 @@ Total Affected Accounts: 1
 Affected Accounts: user@example.com
 
 Malicious IP Addresses and Domains:
+  IP: 203.0.113.4, Domain: malicious.com
+  IP: 203.0.113.3, Domain: phish.com
+  IP: 198.51.100.2, Domain: company.com
+  IP: 192.0.2.2, Domain: bank.com
   IP: 192.0.2.1, Domain: malicious.com
   IP: 203.0.113.5, Domain: bank.com
-  IP: 192.0.2.2, Domain: bank.com
   IP: 192.0.2.3, Domain: security.com
-  IP: 203.0.113.3, Domain: phish.com
-  IP: 203.0.113.4, Domain: malicious.com
-  IP: 198.51.100.2, Domain: company.com
 
 Suspicious IP Addresses and Domains:
-  IP: 203.0.113.1, Domain: secure.com
   IP: 198.51.100.5, Domain: secure.com
+  IP: 203.0.113.1, Domain: secure.com
 
 End of Report

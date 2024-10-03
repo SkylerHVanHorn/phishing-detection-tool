@@ -21,7 +21,17 @@ suspicious_activity_mapping = {
 
 # Load environment variables from the .env file
 #load_dotenv('../config/send_email_credentials.env') Only works when running the code locally and not in docker container
-load_dotenv('/app/.env') #need to reference docker container file
+#load_dotenv('/app/.env') #need to reference docker container file
+
+# Check if the program is running in Docker
+if os.path.exists('/.dockerenv'):
+    # Running in Docker, load the Docker .env file
+    load_dotenv('/app/.env')
+    print("Running inside Docker")
+else:
+    # Running locally, load the local .env file
+    load_dotenv('../config/send_email_credentials.env')
+    print("Running locally")
 
 class EmailProcessor:
     """
@@ -312,14 +322,20 @@ class EmailProcessor:
             "===========================================",
             "         Phishing Email Report             ",
             "===========================================",
+            "This report provides an overview of malicious and suspicious emails.\n"
+            "Emails flagged as malicious are from untrusted senders and contain phishing email keywords.\n"
+            "Suspicious emails do not contain known keywords but do contain embedded URLs and should be investigated further.\n"
             f"Total Emails Scanned: {total_emails_scanned}\n",
             f"Malicious Emails Detected: {len(malicious_emails)} ({malicious_percentage:.2f}%)\n",
             f"Suspicious Emails Detected: {len(suspicious_emails)} ({suspicious_percentage:.2f}%)\n",
-            "This report provides an overview of malicious and suspicious emails.\n"
+
         ]
 
         if malicious_emails or suspicious_emails:
             report_lines.append("Summary of Findings:")
+            # Add information about affected accounts and IPs/domains
+            report_lines.append(f"\nTotal Affected Accounts: {len(affected_accounts)}")
+            report_lines.append(f"Affected Accounts: {', '.join(affected_accounts)}")
             if suspicious_keywords_overall:
                 report_lines.append("\nSuspicious Keywords Found:")
                 report_lines.extend([f"  - {kw}" for kw in suspicious_keywords_overall])
@@ -332,9 +348,7 @@ class EmailProcessor:
             self._append_email_details(malicious_emails, "Malicious Emails", report_lines)
             self._append_email_details(suspicious_emails, "Suspicious Emails", report_lines)
 
-            # Add information about affected accounts and IPs/domains
-            report_lines.append(f"\nTotal Affected Accounts: {len(affected_accounts)}")
-            report_lines.append(f"Affected Accounts: {', '.join(affected_accounts)}")
+            report_lines.append("\nConsiderations for network security hardening:")
 
             # Append IP addresses and domains for malicious and suspicious emails
             self._append_ip_and_domains(malicious_ips_and_domains, "Malicious", report_lines)

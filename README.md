@@ -1,6 +1,6 @@
-# Phishing Email Detection System
+# Phishing Email Detection Program
 
-This project is a Python-based phishing email detection system. It analyzes emails, classifies them as trusted, suspicious, or malicious, and generates a detailed report. It also supports sending the generated report via email.
+This project is a Python-based phishing email detection system. It analyzes emails, classifies them as either trusted, benign, suspicious, or malicious, and generates a detailed report. It also supports sending the generated report via email.
 
 ## Features
 
@@ -18,7 +18,7 @@ This project is a Python-based phishing email detection system. It analyzes emai
 
 **email_processor.py** # Core logic for processing emails
 
-**main.py** # Main entry point for running the program 
+**email_scan.py** # Main entry point for running the program 
 
 **utils.py** # Utility functions for extracting IPs, URLs, etc. 
 
@@ -30,8 +30,87 @@ This project is a Python-based phishing email detection system. It analyzes emai
 
 **test_email_processor.py** # Unit tests for the program
 
+### Input JSON File
+This program takes a JSON file of email meta data as an argument to parse and provide a report for.
 
-## Running Phishing Detection Tool Locally after pulling from GitHub
+Here's an example of what the input JSON file should look like:
+
+[
+
+    {
+        "sender": "phisher@malicious.com",
+        "recipient": "user@example.com",
+        "subject": "Urgent: Verify your account",
+        "timestamp": "2024-08-27T08:30:00Z",
+        "body": "Click here to verify your account: hxxp://malicious[.]com",
+        "headers": {
+            "Received": "from malicious.com (malicious.com [192.0.2.1])",
+            "Content-Type": "text/html; charset=UTF-8"
+        }
+    }
+
+]
+
+Unit tests are included in the test_email_processor.py file. You can run the tests using:
+
+python -m unittest tests.test_email_processor
+
+The tests cover various cases such as email classification (trusted, suspicious, malicious) and report generation.
+
+Sample Unit Test Command:
+
+python -m unittest test_email_processor.TestEmailProcessor
+
+Add or Modify Keywords and Domains:
+
+You can update Indicators.yaml to change the keywords that trigger a phishing alert and trusted domains.
+
+## Running the Phishing Detection Tool with Docker
+This project is packaged as a Docker container to make it easy to execute on any machine with Docker installed. Follow the steps below to pull the Docker image from Docker Hub and execute the tool.
+
+Prerequisites
+
+Docker: Ensure Docker is installed and running on your system. You can install Docker following the instructions from the official Docker documentation.
+
+Docker Image
+This project has been pushed to Docker Hub under the repository: skyhvh/phishing-detection-tool.
+
+Steps to Run 
+
+1. Pull the Docker Image
+
+First, pull the Docker image from Docker Hub:
+
+docker pull skyhvh/phishing-detection-tool:latest
+
+2. Prepare the Input Files
+
+Ensure you have your sample_emails.json file or a similarly structured JSON file that contains the email data. This file should be available on your local machine.
+
+3. Run the Docker Container
+
+You can run the container with the following command:
+
+docker run -it \
+  -v /path/to/your/sample_emails.json:/app/sample_emails.json \
+  -v /path/to/your/output_directory:/app/reports \
+  skyhvh/phishing-detection-tool:latest python email_scan.py /app/sample_emails.json /app/reports/output_report.txt
+
+Replace /path/to/your/sample_emails.json with the absolute path to your sample_emails.json file. \
+Replace /path/to/your/output_directory with the absolute path to the directory where you want the report to be saved.
+The program will generate output_report.txt in the specified output directory.
+
+Once the Docker container finishes running, the report will be available in your specified output directory on your local machine. You can open and review the report, which will contain details about any phishing or suspicious emails found.
+
+Example
+If you have your sample_emails.json file located at /home/user/sample_emails.json and you want to save the report in /home/user/reports, you would run:
+
+docker run -it \
+  -v /home/user/sample_emails.json:/app/sample_emails.json \
+  -v /home/user/reports:/app/reports \
+  skyhvh/phishing-detection-tool:latest python email_scan.py /app/sample_emails.json /app/reports/output_report.txt
+
+## Running Phishing Detection Tool Locally after downloading from GitHub
 ## Requirements
 
 - Python 3.10+
@@ -44,31 +123,25 @@ This project is a Python-based phishing email detection system. It analyzes emai
 
 You can install the required packages using the following command:
 
-bash
-pip install pyyaml python-dotenv
-Setup
+pip install pyyaml python-dotenv \
+
 Clone the Repository:
 
-bash
-Copy code
-git clone <repository-url>
-cd <repository-folder>
+git clone <repository-url> \
+cd <repository-folder> 
+
 Set Up Environment Variables:
 
 Create a .env file in the root directory for email credentials (or rename send_email_credentials.env). Populate it as follows:
 
-makefile
-Copy code
-EMAIL_ADDRESS=<your-email-address>
-APP_PASSWORD=<your-email-password>
+EMAIL_ADDRESS=<your-email-address> \
+APP_PASSWORD=<your-email-password> \
 These credentials will be used to send the generated report to a specified recipient.
 
 Create Configuration File:
 
 Create the Indicators.yaml file for phishing detection keywords and trusted domains. Example:
 
-yaml
-Copy code
 keywords:
   - urgent
   - verify your account
@@ -79,138 +152,13 @@ safe_domains:
   - safe.com
   - trusted.com
   - service.com
-Running the Program
-Command-Line Usage
+
+Running the Program from the command line
+
 To run the program and generate a report:
 
-bash
-Copy code
 python email_scan.py <input_json_file> <output_report_file> [<recipient_email>]
-<input_json_file>: Path to the input JSON file containing email data.
-<output_report_file>: Path to the output report file.
+<input_json_file>: Path to the input JSON file containing email data. \
+<output_report_file>: Path to the output report file. \
 [<recipient_email>]: (Optional) Email address to send the generated report.
-Example:
 
-bash
-Copy code
-python email_scan.py emails.json report.txt recipient@example.com
-
-## Running the Phishing Detection Tool with Docker
-This project is packaged as a Docker container to make it easy to execute on any machine with Docker installed. Follow the steps below to pull the Docker image from Docker Hub and execute the tool.
-
-Prerequisites
-Docker: Ensure Docker is installed and running on your system. You can install Docker following the instructions from the official Docker documentation.
-Docker Hub Account: If you're using a private Docker Hub repository, ensure that you have access to the repository and are logged in.
-Docker Image
-This project has been pushed to Docker Hub under the repository: skyhvh/phishing-detection-tool.
-
-Steps to Run
-Pull the Docker Image
-
-First, pull the Docker image from Docker Hub:
-
-bash
-Copy code
-docker pull skyhvh/phishing-detection-tool:latest
-Prepare the Input Files
-
-Ensure you have your sample_emails.json file or a similarly structured JSON file that contains the email data. This file should be available on your local machine.
-
-Run the Docker Container
-
-You can run the container with the following command:
-
-bash
-Copy code
-docker run -it \
-  -v /path/to/your/sample_emails.json:/app/sample_emails.json \
-  -v /path/to/your/output_directory:/app/reports \
-  skyhvh/phishing-detection-tool:latest python email_scan.py /app/sample_emails.json /app/reports/output_report.txt
-Replace /path/to/your/sample_emails.json with the absolute path to your sample_emails.json file.
-Replace /path/to/your/output_directory with the absolute path to the directory where you want the report to be saved.
-The program will generate output_report.txt in the specified output directory.
-Access the Report
-
-Once the Docker container finishes running, the report will be available in your specified output directory on your local machine. You can open and review the report, which will contain details about any phishing or suspicious emails found.
-
-Example
-If you have your sample_emails.json file located at /home/user/sample_emails.json and you want to save the report in /home/user/reports, you would run:
-
-bash
-Copy code
-docker run -it \
-  -v /home/user/sample_emails.json:/app/sample_emails.json \
-  -v /home/user/reports:/app/reports \
-  skyhvh/phishing-detection-tool:latest python email_scan.py /app/sample_emails.json /app/reports/output_report.txt
-
-Sample Input JSON Structure
-Here's an example of what the input JSON file should look like:
-
-json
-Copy code
-[
-    {
-        "sender": "phisher@malicious.com",
-        "recipient": "user@example.com",
-        "subject": "Urgent: Verify your account",
-        "timestamp": "2024-08-27T08:30:00Z",
-        "body": "Click here to verify your account: hxxp://malicious[.]com",
-        "headers": {
-            "Received": "from malicious.com (malicious.com [192.0.2.1])",
-            "Content-Type": "text/html; charset=UTF-8"
-        }
-    }
-]
-Output
-The program generates a detailed report with the following structure:
-
-markdown
-Copy code
-===========================================
-         Phishing Email Report             
-===========================================
-Total Emails Scanned: 3
-
-Malicious Emails Detected: 2 (66.67%)
-Suspicious Emails Detected: 1 (33.33%)
-
-This report provides an overview of malicious and suspicious emails.
-
-Summary of Findings:
-
-Suspicious Keywords Found:
-  - verify your account
-  - click here
-  - urgent
-
-Suspicious Activities Found:
-  - Embedded URL
-  - False Authority
-  - Pretexting
-  - False sense of Urgency
-  - Untrusted sender
-
-Details of Malicious Emails:
-...
-Unit Testing
-Unit tests are included in the test_email_processor.py file. You can run the tests using:
-
-bash
-Copy code
-python -m unittest tests.test_email_processor
-The tests cover various cases such as email classification (trusted, suspicious, malicious) and report generation.
-
-Sample Unit Test Command:
-bash
-Copy code
-python -m unittest test_email_processor.TestEmailProcessor
-Customization
-Add or Modify Keywords and Domains:
-
-You can update Indicators.yaml to change the keywords that trigger a phishing alert and trusted domains.
-Modify Report Formatting:
-
-The generate_report function in email_processor.py can be adjusted to change how reports are formatted.
-Extend with More Features:
-
-You can easily add more phishing detection mechanisms by extending email_processor.py and adding more utility functions in utils.py.
