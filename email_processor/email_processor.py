@@ -10,6 +10,10 @@ from dotenv import load_dotenv
 from .PhishingEmail import PhishingEmail
 from .utils import extract_ip_from_received, extract_urls, extract_domain, extract_domain_from_received
 
+#Variable Constants
+MALICIOUS = "malicious"
+SUSPICIOUS = "suspicious"
+
 # Dictionary mapping keywords to suspicious activities
 suspicious_activity_mapping = {
     "urgent": "Urgency",
@@ -44,6 +48,7 @@ class EmailProcessor:
         self.emails = []
         self.keywords = []
         self.safe_domains = []
+
 
     def load_emails(self, json_file):
         """
@@ -175,21 +180,19 @@ class EmailProcessor:
         """
         # Extract the sender's domain
         sender_domain = extract_domain(email.get('sender', ''))
-        print(sender_domain)
         # Extract the domain from the 'Received' header
         received_header = email.get('headers', {}).get('Received', '')
         received_domain = extract_domain_from_received(received_header)
-        print(received_domain)
 
         # Compare both domains and return the result
         return sender_domain == received_domain
 
     def generate_report(self):
         """
-        Generate a comprehensive phishing email report.
+        Generate a comprehensive phishing email report, including any parsing errors.
 
         The report includes details of malicious and suspicious emails, IP addresses, domains, affected accounts,
-        suspicious keywords, and activities.
+        suspicious keywords, and activities. Errors encountered during processing are appended at the end of the report.
 
         Returns:
             str: The formatted report.
@@ -199,19 +202,39 @@ class EmailProcessor:
         malicious_ips_and_domains, suspicious_ips_and_domains = [], []  # Initialize lists for IPs and domains
         affected_accounts = set()  # Initialize a set to hold affected accounts (unique)
         suspicious_keywords_overall, suspicious_activities_overall = set(), set()  # Initialize sets for keywords/activities
+        parsing_errors = []  # List to store parsing errors
 
         # Iterate through all emails to process each one
-        for email in self.emails:
-            email_status, ip_addresses, domains, urls, sender_ip = self.email_status(email)
-            self._process_email(email, email_status, ip_addresses, domains, urls, sender_ip,
-                                malicious_emails, suspicious_emails, malicious_ips_and_domains,
-                                suspicious_ips_and_domains, affected_accounts, suspicious_keywords_overall,
-                                suspicious_activities_overall)
+        for idx, email in enumerate(self.emails, start=1):
+            # Log any missing or empty fields, set them to 'Unknown' and continue processing
+            for field in ['sender', 'recipient', 'subject', 'timestamp', 'body', 'headers']:
+                if field not in email or email[field] == "":
+                    email[field] = "Unknown"
+                    parsing_errors.append(f"Email {idx}: Missing or empty field '{field}', set to 'Unknown'.")
+
+            try:
+                email_status, ip_addresses, domains, urls, sender_ip = self.email_status(email)
+                self._process_email(email, email_status, ip_addresses, domains, urls, sender_ip,
+                                    malicious_emails, suspicious_emails, malicious_ips_and_domains,
+                                    suspicious_ips_and_domains, affected_accounts, suspicious_keywords_overall,
+                                    suspicious_activities_overall)
+            except Exception as e:
+                error_msg = f"Email {idx}: Unexpected error - {str(e)}."
+                print(error_msg)  # Log the error
+                parsing_errors.append(error_msg)
 
         # Build and return the final report
-        return self._build_report(total_emails_scanned, malicious_emails, suspicious_emails,
-                                  malicious_ips_and_domains, suspicious_ips_and_domains, affected_accounts,
-                                  suspicious_keywords_overall, suspicious_activities_overall)
+        report = self._build_report(total_emails_scanned, malicious_emails, suspicious_emails,
+                                    malicious_ips_and_domains, suspicious_ips_and_domains, affected_accounts,
+                                    suspicious_keywords_overall, suspicious_activities_overall)
+
+        # If there are any errors captured during processing, add them to the report
+        if parsing_errors:
+            report += "\n\nErrors encountered during processing:\n"
+            for error in parsing_errors:
+                report += f" - {error}\n"
+
+        return report
 
     def _process_email(self, email, status, ip_addresses, domains, urls, sender_ip,
                        malicious_emails, suspicious_emails, malicious_ips_and_domains,
@@ -237,14 +260,14 @@ class EmailProcessor:
         """
         # Handle malicious emails
         # Handle malicious emails
-        if status == "malicious":
+        if status == MALICIOUS:
             self._handle_email(
                 email, status, ip_addresses, domains, urls, sender_ip,
                 malicious_emails, malicious_ips_and_domains, affected_accounts,
                 suspicious_keywords_overall, suspicious_activities_overall
             )
         # Handle suspicious emails
-        elif status == "suspicious":
+        elif status == SUSPICIOUS:
             self._handle_email(
                 email, status, ip_addresses, domains, urls, sender_ip,
                 suspicious_emails, suspicious_ips_and_domains, affected_accounts,
@@ -275,7 +298,7 @@ class EmailProcessor:
                                                                 suspicious_keywords)  # Get suspicious activities
 
         # If it's a malicious email, track suspicious keywords
-        if status == "malicious":
+        if status == MALICIOUS:
             suspicious_keywords_overall.update(suspicious_keywords)
 
         # Always update suspicious activities
@@ -353,7 +376,7 @@ class EmailProcessor:
             "         Phishing Email Report             ",
             "===========================================",
             "This report provides an overview of malicious and suspicious emails.\n"
-            "Emails flagged as malicious are from untrusted senders and contain phishing email keywords.\n"
+            "Emails flagged as malicious are from untrusted senders and contain phishing email keywords or have a mismatch between sender and received feilds.\n"
             "Suspicious emails do not contain known keywords but do contain embedded URLs and should be investigated further.\n"
             f"Total Emails Scanned: {total_emails_scanned}\n",
             f"Malicious Emails Detected: {len(malicious_emails)} ({malicious_percentage:.2f}%)\n",

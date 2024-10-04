@@ -57,11 +57,11 @@ python -m unittest tests.test_email_processor
 
 The tests cover various cases such as email classification (trusted, suspicious, malicious) and report generation.
 
-Sample Unit Test Command:
+#### Sample Unit Test Command:
 
 python -m unittest test_email_processor.TestEmailProcessor
 
-Add or Modify Keywords and Domains:
+#### Add or Modify Keywords and Domains:
 
 You can update Indicators.yaml to change the keywords that trigger a phishing alert and trusted domains.
 
@@ -130,7 +130,7 @@ Clone the Repository:
 git clone <repository-url> \
 cd <repository-folder> 
 
-Set Up Environment Variables:
+### Set Up Environment Variables:
 
 Create a .env file in the root directory for email credentials (or rename send_email_credentials.env). Populate it as follows:
 
@@ -148,6 +148,7 @@ keywords:
   - click here
   - action required
   - account locked
+
 safe_domains:
   - safe.com
   - trusted.com
