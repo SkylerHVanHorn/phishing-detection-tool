@@ -7,7 +7,7 @@ This project is a Python-based phishing email detection system. It analyzes emai
 - Detects suspicious and malicious emails based on sender, keywords, and URLs.
 - Classifies emails into categories:
   - **Trusted**: Emails from trusted domains.
-  - **Benign**: Emails not from trusted domains but no reason to suspect malicious activity (no embedded URLs or malicious keywords).
+  - **Benign**: Emails not from trusted domains but no reason to suspect malicious activity (no embedded URLs,malicious keywords, etc.).
   - **Suspicious**: Emails from untrusted domains containing embedded URLs but no malicious keywords.
   - **Malicious**: Emails containing malicious keywords from untrusted domains and/or evidence of typosquatting.
 - Generates a detailed report containing suspicious and malicious emails with reasoning.
@@ -34,9 +34,8 @@ This project is a Python-based phishing email detection system. It analyzes emai
 This program takes a JSON file of email meta data as an argument to parse and provide a report for.
 
 Here's an example of what the input JSON file should look like:
-
+```json
 [
-
     {
         "sender": "phisher@malicious.com",
         "recipient": "user@example.com",
@@ -48,18 +47,16 @@ Here's an example of what the input JSON file should look like:
             "Content-Type": "text/html; charset=UTF-8"
         }
     }
-
 ]
+```
+
+### Testing
 
 Unit tests are included in the test_email_processor.py file. You can run the tests using:
-
+```bash
 python -m unittest tests.test_email_processor
-
+```
 The tests cover various cases such as email classification (trusted, suspicious, malicious) and report generation.
-
-#### Sample Unit Test Command:
-
-python -m unittest test_email_processor.TestEmailProcessor
 
 #### Add or Modify Keywords and Domains:
 
@@ -80,9 +77,9 @@ Steps to Run
 1. Pull the Docker Image
 
 First, pull the Docker image from Docker Hub:
-
+```bash
 docker pull skyhvh/phishing-detection-tool:latest
-
+```
 2. Prepare the Input Files
 
 Ensure you have your sample_emails.json file or a similarly structured JSON file that contains the email data. This file should be available on your local machine.
@@ -90,13 +87,14 @@ Ensure you have your sample_emails.json file or a similarly structured JSON file
 3. Run the Docker Container
 
 You can run the container with the following command:
-
+```bash
 docker run -it \
   -v /path/to/your/sample_emails.json:/app/sample_emails.json \
   -v /path/to/your/output_directory:/app/reports \
   skyhvh/phishing-detection-tool:latest python email_scan.py /app/sample_emails.json /app/reports/output_report.txt
+````
+Replace /path/to/your/sample_emails.json with the absolute path to your sample_emails.json file.
 
-Replace /path/to/your/sample_emails.json with the absolute path to your sample_emails.json file. \
 Replace /path/to/your/output_directory with the absolute path to the directory where you want the report to be saved.
 The program will generate output_report.txt in the specified output directory.
 
@@ -104,12 +102,12 @@ Once the Docker container finishes running, the report will be available in your
 
 Example
 If you have your sample_emails.json file located at /home/user/sample_emails.json and you want to save the report in /home/user/reports, you would run:
-
+```bash
 docker run -it \
   -v /home/user/sample_emails.json:/app/sample_emails.json \
   -v /home/user/reports:/app/reports \
   skyhvh/phishing-detection-tool:latest python email_scan.py /app/sample_emails.json /app/reports/output_report.txt
-
+````
 ## Running Phishing Detection Tool Locally after downloading from GitHub
 ## Requirements
 
@@ -123,8 +121,9 @@ docker run -it \
 
 You can install the required packages using the following command:
 
-pip install pyyaml python-dotenv \
-
+```bash
+pip install pyyaml python-dotenv
+```
 Clone the Repository:
 
 git clone <repository-url> \
@@ -157,9 +156,9 @@ safe_domains:
 Running the Program from the command line
 
 To run the program and generate a report:
-
+```bash
 python email_scan.py <input_json_file> <output_report_file> [<recipient_email>]
 <input_json_file>: Path to the input JSON file containing email data. \
 <output_report_file>: Path to the output report file. \
 [<recipient_email>]: (Optional) Email address to send the generated report.
-
+```

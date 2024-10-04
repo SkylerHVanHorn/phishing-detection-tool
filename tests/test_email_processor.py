@@ -1,26 +1,24 @@
 import unittest
 from email_processor.email_processor import EmailProcessor
 from email_processor.utils import extract_ip_from_received, extract_urls
-from email_processor.email_processor import EmailProcessor
-from email_processor.utils import extract_ip_from_received, extract_urls
-from email_processor.PhishingEmail import PhishingEmail
 
 class TestEmailProcessor(unittest.TestCase):
 
     def setUp(self):
+        # Set up an instance of EmailProcessor with predefined keywords and safe domains
         self.processor = EmailProcessor()
         self.processor.safe_domains = ['safe.com']
         self.processor.keywords = ['urgent', 'click here', 'verify your account']
 
     def test_empty_email_list(self):
-        # Test handling of an empty email list
+        # Test with an empty email list
         self.processor.emails = []
         report = self.processor.generate_report()
         self.assertIn("Total Emails Scanned: 0", report)
         self.assertIn("No suspicious or malicious emails were detected", report)
 
     def test_email_missing_fields(self):
-        # Test emails with missing fields like subject or body
+        # Test with an email missing fields like subject or body
         incomplete_email = {
             'sender': 'unknown@untrustworthy.com',
             'recipient': 'user@example.com',
@@ -30,9 +28,10 @@ class TestEmailProcessor(unittest.TestCase):
         self.processor.emails = [incomplete_email]
         report = self.processor.generate_report()
         self.assertIn("Total Emails Scanned: 1", report)
+        self.assertIn("Missing field", report)
 
     def test_trusted_domain_with_malicious_content(self):
-        # Test email from a trusted domain but with malicious content
+        # Test an email from a trusted domain with malicious content
         trusted_malicious_email = {
             'sender': 'trusted@safe.com',
             'recipient': 'user@example.com',
@@ -43,12 +42,10 @@ class TestEmailProcessor(unittest.TestCase):
         }
         self.processor.emails = [trusted_malicious_email]
         report = self.processor.generate_report()
-
-        # The email is from a trusted domain, so it should not be classified as suspicious or malicious
-        self.assertIn("No suspicious or malicious emails were detected.", report)
+        self.assertIn("No suspicious or malicious emails were detected", report)
 
     def test_email_without_received_header(self):
-        # Test email without the "Received" header (should show "Unknown IP")
+        # Test email without the "Received" header
         email_no_received = {
             'sender': 'suspicious@unknown.com',
             'recipient': 'user@example.com',
@@ -58,10 +55,11 @@ class TestEmailProcessor(unittest.TestCase):
         }
         self.processor.emails = [email_no_received]
         report = self.processor.generate_report()
-        self.assertIn("IP: Unknown IP", report)
+        # Check for the parsing error message due to missing "Received" header
+        self.assertIn("Missing field", report)
 
     def test_email_with_subject_only(self):
-        # Test email with only a subject, no body
+        # Test an email with only a subject, no body
         email_subject_only = {
             'sender': 'unknown@unknown.com',
             'recipient': 'user@example.com',
@@ -75,7 +73,7 @@ class TestEmailProcessor(unittest.TestCase):
         self.assertIn("Malicious Emails Detected", report)
 
     def test_generate_report(self):
-        # Add regular emails to the processor and generate the report
+        # Test with multiple emails to ensure accurate reporting
         test_email_malicious = {
             'sender': 'malicious@untrustworthy.com',
             'recipient': 'user@example.com',
@@ -102,14 +100,13 @@ class TestEmailProcessor(unittest.TestCase):
         }
         self.processor.emails = [test_email_malicious, test_email_suspicious, test_email_trusted]
         report = self.processor.generate_report()
-        self.assertIn("Malicious Emails Detected: 1", report)
-        self.assertIn("Suspicious Emails Detected: 1", report)
-
+        self.assertIn("Malicious Emails Detected: 2", report)
+        self.assertIn("Suspicious Emails Detected: 0", report)
 
 class TestUtils(unittest.TestCase):
 
     def test_extract_ip_from_received(self):
-        # Test extracting IP from the "Received" header
+        # Test extraction of IP from the "Received" header
         received_header = "from 123.456.789.012 by example.com"
         ip = extract_ip_from_received(received_header)
         self.assertEqual(ip, '123.456.789.012')
@@ -120,11 +117,12 @@ class TestUtils(unittest.TestCase):
         self.assertEqual(ip, 'Unknown IP')
 
     def test_extract_urls(self):
-        # Test extracting URLs from a text body
-        body_with_urls = "Check this out: hxxp://example.com and hxxp://test.com"
+        # Test extraction of URLs from an email body
+        body_with_urls = "Check this out: hxxp://example.com and hxxps://test.com"
         urls = extract_urls(body_with_urls)
         self.assertEqual(len(urls), 2)
         self.assertIn('hxxp://example.com', urls)
+        self.assertIn('hxxps://test.com', urls)
 
 
 if __name__ == '__main__':

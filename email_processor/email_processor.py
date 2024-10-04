@@ -91,6 +91,21 @@ class EmailProcessor:
         # Extract the list of 'safe_domains' from the YAML file; if the key doesn't exist, use an empty list by default
         self.safe_domains = config.get('trusted_domains', [])
 
+    def _validate_email(self, email):
+        """
+        Validate email fields, raise an error if any field is missing or empty.
+
+        Args:
+            email (dict): The email data.
+
+        Raises:
+            KeyError: If a required field is missing or empty.
+        """
+        required_fields = ['sender', 'recipient', 'subject', 'body', 'headers', 'timestamp']
+        for field in required_fields:
+            if field not in email or not email[field]:
+                raise KeyError(field)
+
     def is_suspicious(self, email):
         """
         Check if the sender's domain is suspicious by comparing it to the list of trusted domains.
@@ -206,33 +221,25 @@ class EmailProcessor:
 
         # Iterate through all emails to process each one
         for idx, email in enumerate(self.emails, start=1):
-            # Log any missing or empty fields, set them to 'Unknown' and continue processing
-            for field in ['sender', 'recipient', 'subject', 'timestamp', 'body', 'headers']:
-                if field not in email or email[field] == "":
-                    email[field] = "Unknown"
-                    parsing_errors.append(f"Email {idx}: Missing or empty field '{field}', set to 'Unknown'.")
-
             try:
+                self._validate_email(email)
                 email_status, ip_addresses, domains, urls, sender_ip = self.email_status(email)
                 self._process_email(email, email_status, ip_addresses, domains, urls, sender_ip,
                                     malicious_emails, suspicious_emails, malicious_ips_and_domains,
                                     suspicious_ips_and_domains, affected_accounts, suspicious_keywords_overall,
                                     suspicious_activities_overall)
+            except KeyError as e:
+                parsing_errors.append(f"Email {idx}: Error Parsing field '{e}'. Please check the input data")
             except Exception as e:
-                error_msg = f"Email {idx}: Unexpected error - {str(e)}."
-                print(error_msg)  # Log the error
-                parsing_errors.append(error_msg)
+                parsing_errors.append(f"Email {idx}: Error - {str(e)}.")
 
-        # Build and return the final report
         report = self._build_report(total_emails_scanned, malicious_emails, suspicious_emails,
                                     malicious_ips_and_domains, suspicious_ips_and_domains, affected_accounts,
                                     suspicious_keywords_overall, suspicious_activities_overall)
 
-        # If there are any errors captured during processing, add them to the report
         if parsing_errors:
             report += "\n\nErrors encountered during processing:\n"
-            for error in parsing_errors:
-                report += f" - {error}\n"
+            report += "\n".join(f" - {error}" for error in parsing_errors)
 
         return report
 
