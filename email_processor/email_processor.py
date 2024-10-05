@@ -135,7 +135,7 @@ class EmailProcessor:
         return any(keyword in email.get('body', '').lower() or keyword in email.get('subject', '').lower()
                    for keyword in self.keywords)
 
-    def email_status(self, email):
+    def get_email_status(self, email):
         """
         Determine the status of an email as trusted, suspicious, or malicious.
 
@@ -223,7 +223,7 @@ class EmailProcessor:
         for idx, email in enumerate(self.emails, start=1):
             try:
                 self._validate_email(email)
-                email_status, ip_addresses, domains, urls, sender_ip = self.email_status(email)
+                email_status, ip_addresses, domains, urls, sender_ip = self.get_email_status(email)
                 self._process_email(email, email_status, ip_addresses, domains, urls, sender_ip,
                                     malicious_emails, suspicious_emails, malicious_ips_and_domains,
                                     suspicious_ips_and_domains, affected_accounts, suspicious_keywords_overall,
@@ -235,12 +235,8 @@ class EmailProcessor:
 
         report = self._build_report(total_emails_scanned, malicious_emails, suspicious_emails,
                                     malicious_ips_and_domains, suspicious_ips_and_domains, affected_accounts,
-                                    suspicious_keywords_overall, suspicious_activities_overall)
-
-        if parsing_errors:
-            report += "\n\nErrors encountered during processing:\n"
-            report += "\n".join(f" - {error}" for error in parsing_errors)
-
+                                    suspicious_keywords_overall, suspicious_activities_overall,parsing_errors)
+        
         return report
 
     def _process_email(self, email, status, ip_addresses, domains, urls, sender_ip,
@@ -356,7 +352,7 @@ class EmailProcessor:
 
     def _build_report(self, total_emails_scanned, malicious_emails, suspicious_emails,
                       malicious_ips_and_domains, suspicious_ips_and_domains, affected_accounts,
-                      suspicious_keywords_overall, suspicious_activities_overall):
+                      suspicious_keywords_overall, suspicious_activities_overall,parsing_errors):
         """
         Build the phishing email report with details, including percentages of malicious/suspicious emails.
 
@@ -390,9 +386,11 @@ class EmailProcessor:
             f"Suspicious Emails Detected: {len(suspicious_emails)} ({suspicious_percentage:.2f}%)\n",
 
         ]
-
+        if parsing_errors:
+            report_lines.append( "***Errors encountered during processing***:\n")
+            report_lines.append("\n".join(f" - {error}" for error in parsing_errors))
         if malicious_emails or suspicious_emails:
-            report_lines.append("Summary of Findings:")
+            report_lines.append("\nSummary of Findings:")
             # Add information about affected accounts and IPs/domains
             report_lines.append(f"\nTotal Affected Accounts: {len(affected_accounts)}")
             report_lines.append(f"Affected Accounts: {', '.join(affected_accounts)}")
