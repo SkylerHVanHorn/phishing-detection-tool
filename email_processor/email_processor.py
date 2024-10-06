@@ -2,10 +2,10 @@ import json
 import os
 import yaml
 import smtplib
-import re
+#import re
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
-from datetime import datetime
+#from datetime import datetime
 from dotenv import load_dotenv
 from .PhishingEmail import PhishingEmail
 from .utils import extract_ip_from_received, extract_urls, extract_domain, extract_domain_from_received
@@ -121,13 +121,13 @@ class EmailProcessor:
 
     def is_malicious(self, email):
         """
-        Check if the email contains malicious content based on the presence of specific keywords.
+        Check if the email contains malicious content based on the presence of specific keywords or if the sender and received fields do not match.
 
         Args:
             email (dict): The email data to check.
 
         Returns:
-            bool: True if malicious keywords are found in the subject or body, False otherwise.
+            bool: True if malicious keywords are found in the subject or body, or if the sender does not match received from, False otherwise.
         """
         # If the sender field and the received header do not match, flag the email as malicious
         if not self.compare_sender_and_received_domains(email):
@@ -211,8 +211,9 @@ class EmailProcessor:
         # Iterate through all emails to process each one
         for idx, email in enumerate(self.emails, start=1):
             try:
-                self.validate_email(email)
-                email_status, ip_addresses, domains, urls, sender_ip = self.get_email_status(email)
+                self.validate_email(email) #Check to see if the email is in the correct format without any missing entries
+                # Get the status (trusted,malicious,suspicious, or benign)
+                email_status, ip_addresses, domains, urls, sender_ip = self.get_email_status(email) #Store the returned email data to create a PhishingEmail object
                 self.process_email(email, email_status, ip_addresses, domains, urls, sender_ip,
                                     malicious_emails, suspicious_emails, malicious_ips_and_domains,
                                     suspicious_ips_and_domains, affected_accounts, suspicious_keywords_overall,
@@ -235,7 +236,7 @@ class EmailProcessor:
         """
         Function to process each email based on its status (malicious or suspicious).
         ***Currently, could be removed and 'handle_email' could be modified to be used in place of this, however this simplifies future
-        email classifications that may require different logic to handle.
+        email classification additions that may require different logic to handle.
 
         Args:
             email (dict): The email to process.
@@ -287,14 +288,13 @@ class EmailProcessor:
             suspicious_activities_overall (set): Set to track overall suspicious activities.
         """
         suspicious_keywords = set()  # Track suspicious keywords found in this email
-        suspicious_activities = self.get_suspicious_activities(email, urls,
-                                                                suspicious_keywords)  # Get suspicious activities
+        suspicious_activities = self.get_suspicious_activities(email, urls, suspicious_keywords)  # Get suspicious activities
 
-        # If it's a malicious email, track suspicious keywords
+        # If it's a malicious email, track suspicious keywords in a set
         if status == MALICIOUS:
             suspicious_keywords_overall.update(suspicious_keywords)
 
-        # Always update suspicious activities
+        # Always update suspicious activities, malicious or suspicious
         suspicious_activities_overall.update(suspicious_activities)
 
         # Create a PhishingEmail object for the current email (malicious or suspicious)
