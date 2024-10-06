@@ -162,3 +162,8 @@ python email_scan.py <input_json_file> <output_report_file> [<recipient_email>]
 <output_report_file>: Path to the output report file. \
 [<recipient_email>]: (Optional) Email address to send the generated report.
 ```
+
+### Next Improvements
+1. Integrate user interaction to confirm if suspicious emails are in fact malicious
+2. Log 'malicious' email sender domains as an 'untrusted domain' indicator and use that to process future emails faster
+3. Connect to SQL database for logging reports regularly.

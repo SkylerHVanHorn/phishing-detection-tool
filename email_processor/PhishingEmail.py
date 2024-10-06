@@ -7,7 +7,7 @@ class PhishingEmail:
         self.suspicious_keywords = suspicious_keywords
         self.urls = urls
         self.sender_ip = sender_ip
-        self.suspicious_activities = suspicious_activities  # New field for suspicious activities
+        self.suspicious_activities = suspicious_activities
 
     def __str__(self):
         keywords_str = ', '.join(self.suspicious_keywords) if self.suspicious_keywords else 'None'

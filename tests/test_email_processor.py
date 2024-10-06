@@ -28,7 +28,7 @@ class TestEmailProcessor(unittest.TestCase):
         self.processor.emails = [incomplete_email]
         report = self.processor.generate_report()
         self.assertIn("Total Emails Scanned: 1", report)
-        self.assertIn("Missing field", report)
+        self.assertIn("Error Parsing field", report)
 
     def test_trusted_domain_with_malicious_content(self):
         # Test an email from a trusted domain with malicious content
@@ -56,7 +56,7 @@ class TestEmailProcessor(unittest.TestCase):
         self.processor.emails = [email_no_received]
         report = self.processor.generate_report()
         # Check for the parsing error message due to missing "Received" header
-        self.assertIn("Missing field", report)
+        self.assertIn("Error Parsing field ''headers''", report)
 
     def test_email_with_subject_only(self):
         # Test an email with only a subject, no body

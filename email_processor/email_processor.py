@@ -31,11 +31,11 @@ suspicious_activity_mapping = {
 if os.path.exists('/.dockerenv'):
     # Running in Docker, load the Docker .env file
     load_dotenv('/app/.env')
-    print("Running inside Docker")
+    #print("Running inside Docker")
 else:
     # Running locally, load the local .env file
     load_dotenv('../config/send_email_credentials.env')
-    print("Running locally")
+    #print("Running locally")
 
 
 class EmailProcessor:
@@ -91,7 +91,7 @@ class EmailProcessor:
         # Extract the list of 'safe_domains' from the YAML file; if the key doesn't exist, use an empty list by default
         self.safe_domains = config.get('trusted_domains', [])
 
-    def _validate_email(self, email):
+    def validate_email(self, email):
         """
         Validate email fields, raise an error if any field is missing or empty.
 
@@ -117,7 +117,7 @@ class EmailProcessor:
             bool: True if the domain is not trusted, False if trusted.
         """
         # Extract the domain from the sender's email address and compare it against the trusted domains list
-        return self._extract_domain(email.get('sender', '')) not in self.safe_domains
+        return extract_domain(email.get('sender', '')) not in self.safe_domains
 
     def is_malicious(self, email):
         """
@@ -129,6 +129,7 @@ class EmailProcessor:
         Returns:
             bool: True if malicious keywords are found in the subject or body, False otherwise.
         """
+        # If the sender field and the received header do not match, flag the email as malicious
         if not self.compare_sender_and_received_domains(email):
             return True
         # Search for any keyword in either the body or the subject of the email
@@ -150,7 +151,7 @@ class EmailProcessor:
         subject = email.get('subject', '').lower()  # Extract and lowercase the email subject
         received_header = email.get('headers', {}).get('Received', '')  # Get the 'Received' header to extract IP
         sender_ip = extract_ip_from_received(received_header)  # Extract the IP address from the header
-        domain = self._extract_domain(email.get('sender', ''))  # Extract the domain from the sender's email address
+        domain = extract_domain(email.get('sender', ''))  # Extract the domain from the sender's email address
 
         # If the email is from a trusted domain, mark it as "trusted"
         if not self.is_suspicious(email):
@@ -167,21 +168,9 @@ class EmailProcessor:
         # If the email has embedded URLs but no malicious content, mark it as "suspicious"
         if urls:
             return "suspicious", ip_addresses, [domain], urls, sender_ip
-        print(email.get('sender',''))
         # Otherwise, return it as "benign" (suspicious but no URLs or malicious content)
         return "benign", ip_addresses, [domain], urls, sender_ip
 
-    def _extract_domain(self, sender):
-        """
-        Extract the domain from an email address.
-
-        Args:
-            sender (str): The sender's email address.
-
-        Returns:
-            str: The extracted domain.
-        """
-        return sender.split('@')[-1] if '@' in sender else ''  # Return the domain part of the email address
 
     def compare_sender_and_received_domains(self, email):
         """
@@ -222,9 +211,9 @@ class EmailProcessor:
         # Iterate through all emails to process each one
         for idx, email in enumerate(self.emails, start=1):
             try:
-                self._validate_email(email)
+                self.validate_email(email)
                 email_status, ip_addresses, domains, urls, sender_ip = self.get_email_status(email)
-                self._process_email(email, email_status, ip_addresses, domains, urls, sender_ip,
+                self.process_email(email, email_status, ip_addresses, domains, urls, sender_ip,
                                     malicious_emails, suspicious_emails, malicious_ips_and_domains,
                                     suspicious_ips_and_domains, affected_accounts, suspicious_keywords_overall,
                                     suspicious_activities_overall)
@@ -233,18 +222,20 @@ class EmailProcessor:
             except Exception as e:
                 parsing_errors.append(f"Email {idx}: Error - {str(e)}.")
 
-        report = self._build_report(total_emails_scanned, malicious_emails, suspicious_emails,
+        report = self.build_report(total_emails_scanned, malicious_emails, suspicious_emails,
                                     malicious_ips_and_domains, suspicious_ips_and_domains, affected_accounts,
                                     suspicious_keywords_overall, suspicious_activities_overall,parsing_errors)
-        
+
         return report
 
-    def _process_email(self, email, status, ip_addresses, domains, urls, sender_ip,
+    def process_email(self, email, status, ip_addresses, domains, urls, sender_ip,
                        malicious_emails, suspicious_emails, malicious_ips_and_domains,
                        suspicious_ips_and_domains, affected_accounts, suspicious_keywords_overall,
                        suspicious_activities_overall):
         """
-        Helper function to process each email based on its status (malicious or suspicious).
+        Function to process each email based on its status (malicious or suspicious).
+        ***Currently, could be removed and 'handle_email' could be modified to be used in place of this, however this simplifies future
+        email classifications that may require different logic to handle.
 
         Args:
             email (dict): The email to process.
@@ -262,22 +253,21 @@ class EmailProcessor:
             suspicious_activities_overall (set): Set to track overall suspicious activities.
         """
         # Handle malicious emails
-        # Handle malicious emails
         if status == MALICIOUS:
-            self._handle_email(
+            self.handle_email(
                 email, status, ip_addresses, domains, urls, sender_ip,
                 malicious_emails, malicious_ips_and_domains, affected_accounts,
                 suspicious_keywords_overall, suspicious_activities_overall
             )
         # Handle suspicious emails
         elif status == SUSPICIOUS:
-            self._handle_email(
+            self.handle_email(
                 email, status, ip_addresses, domains, urls, sender_ip,
                 suspicious_emails, suspicious_ips_and_domains, affected_accounts,
                 suspicious_keywords_overall, suspicious_activities_overall
             )
 
-    def _handle_email(self, email, status, ip_addresses, domains, urls, sender_ip,
+    def handle_email(self, email, status, ip_addresses, domains, urls, sender_ip,
                       emails_list, ips_and_domains_list, affected_accounts,
                       suspicious_keywords_overall, suspicious_activities_overall):
         """
@@ -297,7 +287,7 @@ class EmailProcessor:
             suspicious_activities_overall (set): Set to track overall suspicious activities.
         """
         suspicious_keywords = set()  # Track suspicious keywords found in this email
-        suspicious_activities = self._get_suspicious_activities(email, urls,
+        suspicious_activities = self.get_suspicious_activities(email, urls,
                                                                 suspicious_keywords)  # Get suspicious activities
 
         # If it's a malicious email, track suspicious keywords
@@ -313,7 +303,7 @@ class EmailProcessor:
             sender=email['sender'],
             recipient=email['recipient'],
             subject=email['subject'],
-            suspicious_keywords=suspicious_keywords if status == "malicious" else [],
+            suspicious_keywords=suspicious_keywords if status == MALICIOUS else [],
             # Only store keywords for malicious
             urls=urls,
             sender_ip=sender_ip,
@@ -326,7 +316,7 @@ class EmailProcessor:
             ips_and_domains_list.append((ip, domain))
         affected_accounts.add(email['recipient'])  # Track affected accounts
 
-    def _get_suspicious_activities(self, email, urls, suspicious_keywords):
+    def get_suspicious_activities(self, email, urls, suspicious_keywords):
         """
         Extract suspicious activities from the email based on keywords and URLs.
 
@@ -338,7 +328,7 @@ class EmailProcessor:
         Returns:
             set: The set of suspicious activities.
         """
-        suspicious_activities = {"Untrusted sender"}  # Start with "Untrusted sender"
+        suspicious_activities = {"Untrusted sender"}  # Any email flagged will be from an untrusted sender.
         if urls:
             suspicious_activities.add("Embedded URL")  # Add "Embedded URL" if URLs are found
         if not self.compare_sender_and_received_domains(email):
@@ -350,7 +340,7 @@ class EmailProcessor:
                 suspicious_activities.add(suspicious_activity_mapping.get(keyword, "Unknown Activity"))
         return suspicious_activities
 
-    def _build_report(self, total_emails_scanned, malicious_emails, suspicious_emails,
+    def build_report(self, total_emails_scanned, malicious_emails, suspicious_emails,
                       malicious_ips_and_domains, suspicious_ips_and_domains, affected_accounts,
                       suspicious_keywords_overall, suspicious_activities_overall,parsing_errors):
         """
@@ -365,6 +355,7 @@ class EmailProcessor:
             affected_accounts (set): Set of affected accounts.
             suspicious_keywords_overall (set): Set of suspicious keywords across all emails.
             suspicious_activities_overall (set): Set of suspicious activities across all emails.
+            parsing_errors (list): List of parsing errors that occurred during the email scanning process.
 
         Returns:
             str: The formatted report.
@@ -403,14 +394,14 @@ class EmailProcessor:
                 report_lines.extend([f"  - {activity}" for activity in suspicious_activities_overall])
 
             # Append details of malicious and suspicious emails to the report
-            self._append_email_details(malicious_emails, "Malicious Emails", report_lines)
-            self._append_email_details(suspicious_emails, "Suspicious Emails", report_lines)
+            self.append_email_details(malicious_emails, "Malicious Emails", report_lines)
+            self.append_email_details(suspicious_emails, "Suspicious Emails", report_lines)
 
             report_lines.append("\nConsiderations for security configurations:")
 
             # Append IP addresses and domains for malicious and suspicious emails
-            self._append_ip_and_domains(malicious_ips_and_domains, "Malicious", report_lines)
-            self._append_ip_and_domains(suspicious_ips_and_domains, "Suspicious", report_lines)
+            self.append_ip_and_domains(malicious_ips_and_domains, "Malicious", report_lines)
+            self.append_ip_and_domains(suspicious_ips_and_domains, "Suspicious", report_lines)
 
         else:
             report_lines.append("No suspicious or malicious emails were detected.")
@@ -418,7 +409,7 @@ class EmailProcessor:
         report_lines.append("\nEnd of Report")
         return '\n'.join(report_lines)
 
-    def _append_email_details(self, emails, title, report_lines):
+    def append_email_details(self, emails, title, report_lines):
         """
         Append details for malicious or suspicious emails to the report.
 
@@ -434,7 +425,7 @@ class EmailProcessor:
                 report_lines.append(str(email))
                 report_lines.append("-" * 50)
 
-    def _append_ip_and_domains(self, ips_and_domains, category, report_lines):
+    def append_ip_and_domains(self, ips_and_domains, category, report_lines):
         """
         Append IP addresses and domains to the report.
 
