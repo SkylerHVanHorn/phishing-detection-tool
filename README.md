@@ -116,13 +116,11 @@ docker run -it \
   - `yaml`
   - `dotenv`
   - `smtplib`
-  - `re`
-  - `unittest`
 
 You can install the required packages using the following command:
 
 ```bash
-pip install pyyaml python-dotenv
+pip install pyyaml python-dotenv smtplib
 ```
 Clone the Repository:
 
