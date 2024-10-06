@@ -124,15 +124,15 @@ pip install pyyaml python-dotenv smtplib
 ```
 Clone the Repository:
 
-git clone <repository-url> \
-cd <repository-folder> 
+git clone repository-url \
+cd repository-folder 
 
 ### Set Up Environment Variables:
 
 Create a .env file in the root directory for email credentials (or rename send_email_credentials.env). Populate it as follows:
 
-EMAIL_ADDRESS=<your-email-address> \
-APP_PASSWORD=<your-email-password> \
+EMAIL_ADDRESS= your-email-address \
+APP_PASSWORD= your-email-password \
 These credentials will be used to send the generated report to a specified recipient.
 
 Create Configuration File:
