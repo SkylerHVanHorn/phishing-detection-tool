@@ -37,7 +37,7 @@ class TestEmailProcessor(unittest.TestCase):
             'recipient': 'user@example.com',
             'subject': 'urgent action required',
             'body': 'This is an important message. click here to verify your account.',
-            'headers': {'Received': 'from 123.456.789.012'},
+            'headers': {'Received': 'from 123.123.123.123'},
             'timestamp': '2024-09-30T12:34:56'
         }
         self.processor.emails = [trusted_malicious_email]
