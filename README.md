@@ -185,16 +185,20 @@ Lists any parsing errors encountered while scanning the emails, such as missing 
 Details of Malicious and Suspicious Emails
 
 Sender, Recipient, and Subject: Key metadata of each email.
-IP Addresses and Domains: Extracted IPs and domains from the email headers and body.
-Suspicious Keywords Found: Keywords that indicate potential phishing content.
-Suspicious Activities: Describes the type of suspicious activity identified, such as:
-Urgency
-False Authority
-Typosquatting
-Pretexting
-Embedded URLs
-Considerations for Security Configurations
 
+IP Addresses and Domains: Extracted IPs and domains from the email headers and body.
+
+Suspicious Keywords Found: Keywords that indicate potential phishing content.
+
+Suspicious Activities: Describes the type of suspicious activity identified, such as:
+
+Urgency \
+False Authority \
+Typosquatting \
+Pretexting \
+Embedded URLs 
+
+Considerations for Security Configurations: \
 Lists all malicious and suspicious IP addresses and domains found during the scan.
 
 Example Report:
