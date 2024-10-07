@@ -1,4 +1,4 @@
-# Use an official Python runtime as a base image
+# Python runtime as a base image
 FROM python:3.12-slim
 
 # Set the working directory inside the container
