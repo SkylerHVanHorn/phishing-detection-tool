@@ -133,8 +133,7 @@ pip install pyyaml python-dotenv smtplib
 ```
 Clone the Repository:
 
-git clone repository-url \
-cd repository-folder 
+git clone https://github.com/skylerhvanhorn/phishing-detection-tool.git
 
 ### Set Up Environment Variables:
 
