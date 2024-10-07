@@ -22,7 +22,7 @@ class TestEmailProcessor(unittest.TestCase):
         incomplete_email = {
             'sender': 'unknown@untrustworthy.com',
             'recipient': 'user@example.com',
-            'headers': {'Received': 'from 123.456.789.012'},
+            'headers': {'Received': 'from 123.123.123.123'},
             'timestamp': '2024-09-30T12:34:56'
         }
         self.processor.emails = [incomplete_email]
@@ -65,7 +65,7 @@ class TestEmailProcessor(unittest.TestCase):
             'recipient': 'user@example.com',
             'subject': 'urgent action required',
             'body': '',
-            'headers': {'Received': 'from 123.456.789.012'},
+            'headers': {'Received': 'from 123.123.123.123'},
             'timestamp': '2024-09-30T12:34:56'
         }
         self.processor.emails = [email_subject_only]
@@ -79,7 +79,7 @@ class TestEmailProcessor(unittest.TestCase):
             'recipient': 'user@example.com',
             'subject': 'urgent action required',
             'body': 'This is an important message. click here to verify your account.',
-            'headers': {'Received': 'from 123.456.789.012'},
+            'headers': {'Received': 'from 123.123.123.123'},
             'timestamp': '2024-09-30T12:34:56'
         }
         test_email_suspicious = {
@@ -87,7 +87,7 @@ class TestEmailProcessor(unittest.TestCase):
             'recipient': 'user@example.com',
             'subject': 'Special offer just for you',
             'body': 'Please review this offer: hxxp://suspicious-link.com',
-            'headers': {'Received': 'from 111.222.333.444'},
+            'headers': {'Received': 'from 111.222.123.123'},
             'timestamp': '2024-09-30T12:34:56'
         }
         test_email_trusted = {
@@ -95,7 +95,7 @@ class TestEmailProcessor(unittest.TestCase):
             'recipient': 'user@example.com',
             'subject': 'Your account has been updated',
             'body': 'No suspicious activity.',
-            'headers': {'Received': 'from 123.456.789.012'},
+            'headers': {'Received': 'from 123.123.123.123'},
             'timestamp': '2024-09-30T12:34:56'
         }
         self.processor.emails = [test_email_malicious, test_email_suspicious, test_email_trusted]
@@ -107,9 +107,9 @@ class TestUtils(unittest.TestCase):
 
     def test_extract_ip_from_received(self):
         # Test extraction of IP from the "Received" header
-        received_header = "from 123.456.789.012 by example.com"
+        received_header = "from 123.123.123.123 by example.com"
         ip = extract_ip_from_received(received_header)
-        self.assertEqual(ip, '123.456.789.012')
+        self.assertEqual(ip, '123.123.123.123')
 
         # Test with no IP
         received_header_no_ip = "from unknown by example.com"
